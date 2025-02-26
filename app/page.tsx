@@ -58,7 +58,7 @@ export default function Page() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const key = session?.user ? inputValue : randomString;
     const email = session?.user?.email;
@@ -93,7 +93,7 @@ export default function Page() {
         }
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         if (session?.user) {
           return fetch("/api/users", {
             method: "POST",
@@ -146,7 +146,7 @@ export default function Page() {
   return (
     <>
       <div className="text-center min-h-screen flex items-center justify-center font-mono">
-        <Card className="w-96 md:w-[28rem]">
+        <Card className="w-[20rem] md:w-96">
           <CardContent>
             {!shortened && (
               <>
@@ -155,7 +155,11 @@ export default function Page() {
                   A minimal URL shortener service. Enter your destination URL
                   and get a shortened link.
                   {!session?.user && (
-                    <> You are not signed in. Sign in to create custom short links and permanent links.</>
+                    <>
+                      {" "}
+                      You are not signed in. Sign in to create custom short
+                      links and permanent links.
+                    </>
                   )}
                 </p>
                 <form onSubmit={handleSubmit}>
@@ -165,7 +169,7 @@ export default function Page() {
                       <Input
                         key="link"
                         type="url"
-                        className="w-[10rem]"
+                        className="w-48 md:w-64"
                         placeholder="https://example.com"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
@@ -176,14 +180,14 @@ export default function Page() {
                       <p>elr.sh/</p>
                       {!session?.user ? (
                         <Input
-                          className="w-[10rem]"
+                          className="w-48 md:w-64"
                           key="backend"
                           disabled
                           value={randomString}
                         />
                       ) : (
                         <Input
-                          className="w-[10rem]"
+                          className="w-48 md:w-64"
                           key="backend"
                           placeholder="rickroll"
                           value={inputValue}
@@ -193,24 +197,28 @@ export default function Page() {
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <p>Expires in:</p>
-                      <Select
-                        value={expirationDate}
-                        onValueChange={setExpirationDate}
-                      >
-                        <SelectTrigger className="w-[8rem]">
-                          <SelectValue placeholder="Expiration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="3600">1 hour</SelectItem>
-                          <SelectItem value="10800">3 hours</SelectItem>
-                          <SelectItem value="86400">1 day</SelectItem>
-                          <SelectItem value="259200">3 days</SelectItem>
-                          <SelectItem value="604800">7 days</SelectItem>
-                          {session?.user && (
-                            <SelectItem value="never">No expiration</SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <div>
+                        <Select
+                          value={expirationDate}
+                          onValueChange={setExpirationDate}
+                        >
+                          <SelectTrigger className="w-48 md:w-64">
+                            <SelectValue placeholder="Expiration" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="3600">1 hour</SelectItem>
+                            <SelectItem value="10800">3 hours</SelectItem>
+                            <SelectItem value="86400">1 day</SelectItem>
+                            <SelectItem value="259200">3 days</SelectItem>
+                            <SelectItem value="604800">7 days</SelectItem>
+                            {session?.user && (
+                              <SelectItem value="never">
+                                No expiration
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
