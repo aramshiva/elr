@@ -30,7 +30,9 @@ export default function Page() {
   const [shortened, setShortened] = useState(false);
   const [url, setUrl] = useState("");
   const [lastKey, setLastKey] = useState("");
-  const [expirationDate, setExpirationDate] = useState("3600");
+  const [expirationDate, setExpirationDate] = useState(() => {
+    return session?.user ? "never" : "3600";
+  });
   const [isInputValid, setIsInputValid] = useState(true);
   const matcher = new RegExpMatcher({
     ...englishDataset.build(),
@@ -105,47 +107,50 @@ export default function Page() {
       }
     }
 
-    fetch("/api/form", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url: url,
-        key: key,
-        email: email || "anonymous",
-        expiration: expirationDate,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          toast.error(
-            "You have been rate limited. Please try again at a later time."
-          );
-        }
-        return response.json();
-      })
-      .then(() => {
-        if (session?.user) {
-          return fetch("/api/users", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-            }),
-          }).then((response) => {
+    const initialPromise = session?.user
+      ? fetch("/api/form", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: url,
+            key: key,
+            email: email,
+            expiration: expirationDate,
+          }),
+        })
+          .then((response) => {
             if (!response.ok) {
               toast.error(
-                "An error occured with our telemetry system. Please try again later."
+                "You have been rate limited. Please try again at a later time."
               );
             }
             return response.json();
-          });
-        }
-        return Promise.resolve();
-      })
+          })
+          .then(() => {
+            return fetch("/api/users", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email,
+                key: key,
+                url: url
+              }),
+            }).then((response) => {
+              if (!response.ok) {
+                toast.error(
+                  "An error occured with our telemetry system. Please try again later."
+                );
+              }
+              return response.json();
+            });
+          })
+      : Promise.resolve();
+
+    initialPromise
       .then(() => {
         return fetch(
           `/api/link?key=${key}&link=${url}&expiration=${expirationDate}`,
@@ -178,7 +183,7 @@ export default function Page() {
   return (
     <>
       <div className="text-center min-h-screen flex items-center justify-center font-mono">
-        <Card className="w-[20rem] md:w-96">
+        <Card className="w-[20rem] md:w-[28rem]">
           <CardContent>
             {!shortened && (
               <>
@@ -195,31 +200,31 @@ export default function Page() {
                   )}
                 </p>
                 <form onSubmit={handleSubmit}>
-                  <div>
-                    <div className="flex items-center justify-center gap-2 pb-4 text-sm">
+                  <div className="flex flex-col items-center w-full">
+                    <div className="flex items-center justify-between gap-2 pb-4 text-sm w-full">
                       <p>Link: </p>
                       <Input
                         key="link"
                         type="url"
-                        className="w-48 md:w-64"
                         placeholder="https://example.com"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         required
+                        className="flex-1"
                       />
                     </div>
-                    <div className="flex items-center justify-center gap-2 pb-4 text-sm">
+                    <div className="flex items-center justify-between gap-2 pb-4 text-sm w-full">
                       <p>elr.sh/</p>
                       {!session?.user ? (
                         <Input
-                          className="w-48 md:w-64"
                           key="backend"
                           disabled
                           value={randomString}
+                          className="flex-1"
                         />
                       ) : (
                         <Input
-                          className={`w-48 md:w-64 ${
+                          className={`flex-1 ${
                             !isInputValid ? "border-red-500" : ""
                           }`}
                           key="backend"
@@ -234,31 +239,36 @@ export default function Page() {
                         Only letters and numbers are allowed
                       </p>
                     )}
-                    <div className="flex items-center justify-center gap-2 text-sm">
+                    <div className="flex items-center justify-between gap-2 text-sm w-full">
                       <p>Expires in:</p>
-                      <div>
+                      <div className="flex-1">
                         <Select
                           value={expirationDate}
                           onValueChange={setExpirationDate}
                         >
-                          <SelectTrigger className="w-48 md:w-64">
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Expiration" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="3600">1 hour</SelectItem>
-                            <SelectItem value="10800">3 hours</SelectItem>
-                            <SelectItem value="86400">1 day</SelectItem>
-                            <SelectItem value="259200">3 days</SelectItem>
-                            <SelectItem value="604800">7 days</SelectItem>
                             {session?.user && (
                               <SelectItem value="never">
                                 No expiration
                               </SelectItem>
                             )}
+                            <SelectItem value="3600">1 hour</SelectItem>
+                            <SelectItem value="10800">3 hours</SelectItem>
+                            <SelectItem value="86400">1 day</SelectItem>
+                            <SelectItem value="259200">3 days</SelectItem>
+                            <SelectItem value="604800">7 days</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
+                    {!session?.user && expirationDate !== "never" && (
+                      <p className="text-[0.7rem] text-gray-500 pt-2">
+                        Links will expire after the selected duration. Log in to remove the expiration date.
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
                     {!session?.user ? (
