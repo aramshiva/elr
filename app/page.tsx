@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -31,12 +31,20 @@ export default function Page() {
   const [url, setUrl] = useState("");
   const [lastKey, setLastKey] = useState("");
   const [expirationDate, setExpirationDate] = useState("3600");
+  const [isInputValid, setIsInputValid] = useState(true);
   const matcher = new RegExpMatcher({
     ...englishDataset.build(),
     ...englishRecommendedTransformers,
   });
 
   const generateRandomString = () => Math.random().toString(36).substring(2, 7);
+
+  useEffect(() => {
+    if (session?.user) {
+      const isValid = /^[a-zA-Z0-9]*$/.test(inputValue);
+      setIsInputValid(isValid);
+    }
+  }, [inputValue, session?.user]);
 
   const handleRandomize = () => {
     setIsAnimating(true);
@@ -58,6 +66,11 @@ export default function Page() {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const key = session?.user ? inputValue : randomString;
@@ -65,6 +78,11 @@ export default function Page() {
 
     if (!url.trim()) {
       toast.error("Please enter a valid URL");
+      return;
+    }
+
+    if (session?.user && !isInputValid) {
+      toast.error("Custom link can only contain letters and numbers");
       return;
     }
 
@@ -187,14 +205,21 @@ export default function Page() {
                         />
                       ) : (
                         <Input
-                          className="w-48 md:w-64"
+                          className={`w-48 md:w-64 ${
+                            !isInputValid ? "border-red-500" : ""
+                          }`}
                           key="backend"
                           placeholder="rickroll"
                           value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
+                          onChange={handleInputChange}
                         />
                       )}
                     </div>
+                    {session?.user && !isInputValid && inputValue && (
+                      <p className="text-red-500 text-xs mb-2">
+                        Only letters and numbers are allowed
+                      </p>
+                    )}
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <p>Expires in:</p>
                       <div>
@@ -243,7 +268,11 @@ export default function Page() {
                     ) : null}
                   </div>
                   <div className="pt-2">
-                    <Button type="submit" className="w-full">
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={session?.user && !isInputValid}
+                    >
                       Shorten
                     </Button>
                   </div>
