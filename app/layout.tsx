@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "elr.sh",
+  title: "elr",
   description: "An minimal URL shortener service.",
 };
 
