@@ -31,8 +31,9 @@ export default function DataPolicy() {
               <li>We store your target URL and selected backend</li>
               <li>
                 If using GitHub login, we collect your email address and
-                maintain an internal counter to prevent abuse
+                maintain a record of links created by your account
               </li>
+              <li>All shortened links you create are associated with your user account</li>
               <li>Data is stored indefinitely in a Redis database</li>
               <li>
                 Certain request data is securely sent to Arcjet to prevent abuse
@@ -43,7 +44,8 @@ export default function DataPolicy() {
             <h3 className="font-semibold text-xs mt-4">3. Data Usage</h3>
             <p className="text-xs mb-3">
               All data is used exclusively for providing our service and
-              preventing abuse. We use Arcjet, a trusted security partner, to
+              preventing abuse. We associate links with your account to provide you access to your link history
+              and to prevent abuse of the platform. We use Arcjet, a trusted security partner, to
               help protect against spam and malicious activity. We do not share
               your personal data with other third parties.
             </p>
