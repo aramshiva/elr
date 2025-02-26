@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         const searchParams = new URL(request.url).searchParams;
         const key = searchParams.get('key');
         const url = searchParams.get('link');
+        const expiration = searchParams.get('expiration');
 
         if (!key || !url) {
             return NextResponse.json(
@@ -49,7 +50,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        await client.set(key, url);
+        if (expiration && expiration !== 'never') {
+            await client.set(key, url, 'EX', parseInt(expiration));
+        } else {
+            await client.set(key, url);
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

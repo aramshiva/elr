@@ -7,6 +7,18 @@ import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { toast } from "sonner";
+import {
+  RegExpMatcher,
+  englishDataset,
+  englishRecommendedTransformers,
+} from "obscenity";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Page() {
   const { data: session } = useSession();
@@ -17,6 +29,12 @@ export default function Page() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [shortened, setShortened] = useState(false);
   const [url, setUrl] = useState("");
+  const [lastKey, setLastKey] = useState("");
+  const [expirationDate, setExpirationDate] = useState("3600");
+  const matcher = new RegExpMatcher({
+    ...englishDataset.build(),
+    ...englishRecommendedTransformers,
+  });
 
   const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
@@ -50,6 +68,11 @@ export default function Page() {
       return;
     }
 
+    if (matcher.hasMatch(key)) {
+      toast.error("Please use appropriate terminology for your URL");
+      return;
+    }
+
     fetch("/api/form", {
       method: "POST",
       headers: {
@@ -59,6 +82,7 @@ export default function Page() {
         url: url,
         key: key,
         email: email || "anonymous",
+        expiration: expirationDate,
       }),
     })
       .then((response) => {
@@ -91,9 +115,12 @@ export default function Page() {
         return Promise.resolve();
       })
       .then(() => {
-        return fetch(`/api/link?key=${key}&link=${url}`, {
-          method: "POST",
-        });
+        return fetch(
+          `/api/link?key=${key}&link=${url}&expiration=${expirationDate}`,
+          {
+            method: "POST",
+          }
+        );
       })
       .then((response) => {
         if (!response.ok) {
@@ -104,8 +131,10 @@ export default function Page() {
         return response.json();
       })
       .then(() => {
+        setLastKey(key);
         setUrl("");
         setInputValue("");
+        setExpirationDate("3600");
         setShortened(true);
       })
       .catch((error) => {
@@ -117,7 +146,7 @@ export default function Page() {
   return (
     <>
       <div className="text-center min-h-screen flex items-center justify-center font-mono">
-        <Card className="w-96">
+        <Card className="w-96 md:w-[28rem]">
           <CardContent>
             {!shortened && (
               <>
@@ -125,22 +154,25 @@ export default function Page() {
                 <p className="text-xs text-gray-500 mb-4 pb-3">
                   A minimal URL shortener service. Enter your destination URL
                   and get a shortened link.
+                  {!session?.user && (
+                    <> You are not signed in. Sign in to create custom short links and permanent links.</>
+                  )}
                 </p>
                 <form onSubmit={handleSubmit}>
                   <div>
-                    <div className="flex items-center justify-center gap-2 pb-4">
+                    <div className="flex items-center justify-center gap-2 pb-4 text-sm">
                       <p>Link: </p>
                       <Input
                         key="link"
                         type="url"
-                        className="w-[14rem]"
+                        className="w-[10rem]"
                         placeholder="https://example.com"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         required
                       />
                     </div>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2 pb-4 text-sm">
                       <p>elr.sh/</p>
                       {!session?.user ? (
                         <Input
@@ -159,12 +191,33 @@ export default function Page() {
                         />
                       )}
                     </div>
+                    <div className="flex items-center justify-center gap-2 text-sm">
+                      <p>Expires in:</p>
+                      <Select
+                        value={expirationDate}
+                        onValueChange={setExpirationDate}
+                      >
+                        <SelectTrigger className="w-[8rem]">
+                          <SelectValue placeholder="Expiration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="3600">1 hour</SelectItem>
+                          <SelectItem value="10800">3 hours</SelectItem>
+                          <SelectItem value="86400">1 day</SelectItem>
+                          <SelectItem value="259200">3 days</SelectItem>
+                          <SelectItem value="604800">7 days</SelectItem>
+                          {session?.user && (
+                            <SelectItem value="never">No expiration</SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
                     {!session?.user ? (
                       <>
                         <Button
-                          className="w-full bg-gray-800"
+                          className="w-full bg-gray-700"
                           onClick={handleRandomize}
                           disabled={isAnimating}
                           type="button"
@@ -174,11 +227,14 @@ export default function Page() {
                         <Button
                           onClick={() => signIn("github", { redirectTo: "/" })}
                           type="button"
+                          className="w-full bg-gray-700"
                         >
                           Sign In
                         </Button>
                       </>
                     ) : null}
+                  </div>
+                  <div className="pt-2">
                     <Button type="submit" className="w-full">
                       Shorten
                     </Button>
@@ -188,11 +244,23 @@ export default function Page() {
             )}
             {shortened && (
               <>
-                <div className="pb-3">
-                  <p className="text-green-700 text-sm pt-3">
+                <div className="pb-3 pt-5">
+                  <p className="text-green-700 text-sm pb-2">
                     Shortened link created!
                   </p>
-                  <p>yay!</p>
+                  <p className="text-sm">Share this link:</p>
+                  <Link
+                    href={`https://elr.sh/${lastKey}`}
+                    className="text-xs underline text-gray-700"
+                  >
+                    https://elr.sh/{lastKey}
+                  </Link>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => setShortened(false)}
+                  >
+                    Shorten another link
+                  </Button>
                 </div>
               </>
             )}
