@@ -71,7 +71,7 @@ export default function Page() {
     setInputValue(value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const key = session?.user ? inputValue : randomString;
     const email = session?.user?.email;
@@ -89,6 +89,20 @@ export default function Page() {
     if (matcher.hasMatch(key)) {
       toast.error("Please use appropriate terminology for your URL");
       return;
+    }
+
+    if (session?.user && inputValue) {
+      try {
+        const checkResponse = await fetch(`/api/link?key=${key}`);
+        if (checkResponse.ok) {
+          toast.error(
+            "This custom link is already taken. Please choose another one."
+          );
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking link availability:", error);
+      }
     }
 
     fetch("/api/form", {
