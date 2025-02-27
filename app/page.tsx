@@ -311,7 +311,7 @@ export default function Page() {
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
                     <Button
-                      className="w-full bg-gray-700 dark:bg-gray-400"
+                      className="w-full bg-zinc-800 dark:bg-gray-400"
                       onClick={handleRandomize}
                       disabled={isAnimating}
                       type="button"
@@ -351,7 +351,7 @@ export default function Page() {
                   <p className="text-sm">Share this link:</p>
                   <Link
                     href={`${
-                      process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"
+                      process.env.NEXT_PUBLIC_DOMAIN_URL || "https://elr.sh/"
                     }${lastKey}`}
                     className="text-xs underline text-gray-700"
                   >
