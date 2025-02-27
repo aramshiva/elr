@@ -214,7 +214,8 @@ export default function Page() {
                       />
                     </div>
                     <div className="flex items-center justify-between gap-2 pb-4 text-sm w-full">
-                      <p>elr.sh/</p>
+                      <p>{process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}
+                      </p>
                       {!session?.user ? (
                         <Input
                           key="backend"
@@ -311,10 +312,10 @@ export default function Page() {
                   </p>
                   <p className="text-sm">Share this link:</p>
                   <Link
-                    href={`https://elr.sh/${lastKey}`}
+                    href={`${process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}${lastKey}`}
                     className="text-xs underline text-gray-700"
                   >
-                    https://elr.sh/{lastKey}
+                   {`${process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}${lastKey}`}
                   </Link>
                   <Button
                     className="w-full mt-4"
