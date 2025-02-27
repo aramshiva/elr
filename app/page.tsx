@@ -227,7 +227,7 @@ export default function Page() {
             {!shortened && (
               <>
                 <p className="text-xl pt-5 pb-1 font-semibold">elr</p>
-                <p className="text-xs text-gray-500 mb-4 pb-3">
+                <p className="text-xs text-zinc-500 mb-4 pb-3">
                   A minimal URL shortener service. Enter your destination URL
                   and get a shortened link.
                   {!session?.user && (
@@ -304,7 +304,7 @@ export default function Page() {
                       </div>
                     </div>
                     {!session?.user && expirationDate !== "never" && (
-                      <p className="text-[0.7rem] text-gray-500 pt-2">
+                      <p className="text-[0.7rem] text-zinc-500 pt-2">
                         Links will expire after the selected duration. Log in to
                         remove the expiration date.
                       </p>
@@ -312,7 +312,7 @@ export default function Page() {
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
                     <Button
-                      className="w-full bg-zinc-800 dark:bg-gray-400"
+                      className="w-full bg-zinc-800 dark:bg-zinc-100"
                       onClick={handleRandomize}
                       disabled={isAnimating}
                       type="button"
@@ -324,7 +324,7 @@ export default function Page() {
                         <Button
                           onClick={() => signIn("github", { redirectTo: "/" })}
                           type="button"
-                          className="w-full bg-black font-sans dark:bg-gray-400"
+                          className="w-full bg-black font-sans dark:bg-white"
                         >
                           Sign In with <SiGithub />
                         </Button>
@@ -334,7 +334,7 @@ export default function Page() {
                   <div className="pt-2">
                     <Button
                       type="submit"
-                      className="w-full dark:hover:bg-gray-300"
+                      className="w-full dark:hover:bg-zinc-300"
                       disabled={session?.user && !isInputValid}
                     >
                       Shorten
@@ -354,7 +354,7 @@ export default function Page() {
                     href={`${
                       process.env.NEXT_PUBLIC_DOMAIN_URL || "https://elr.sh/"
                     }${lastKey}`}
-                    className="text-xs underline text-gray-700"
+                    className="text-xs underline text-zinc-700"
                   >
                     {`${
                       process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"
