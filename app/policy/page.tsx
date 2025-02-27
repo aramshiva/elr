@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function DataPolicy() {
   return (
     <>
-      <div className="text-center min-h-screen flex items-center justify-center font-mono py-20">
+      <div className="text-center min-h-screen flex items-center justify-center font-mono py-20 dark:bg-black">
         <Card className="w-[40rem] pt-5">
           <CardContent>
             <div className="pb-1">
@@ -35,6 +35,7 @@ export default function DataPolicy() {
               </li>
               <li>All shortened links you create are associated with your user account</li>
               <li>Data is stored indefinitely in a Redis database</li>
+              <li>We collect your theme preference (light mode/dark mode) and save it for 30 days</li>
               <li>
                 Certain request data is securely sent to Arcjet to prevent abuse
                 and protect the service
@@ -45,7 +46,8 @@ export default function DataPolicy() {
             <p className="text-xs mb-3">
               All data is used exclusively for providing our service and
               preventing abuse. We associate links with your account to provide you access to your link history
-              and to prevent abuse of the platform. We use Arcjet, a trusted security partner, to
+              and to prevent abuse of the platform. Theme preferences are stored to enhance your user experience.
+              We use Arcjet, a trusted security partner, to
               help protect against spam and malicious activity. We do not share
               your personal data with other third parties.
             </p>

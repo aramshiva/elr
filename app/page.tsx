@@ -38,8 +38,13 @@ export default function Page() {
     ...englishDataset.build(),
     ...englishRecommendedTransformers,
   });
+  const [darkMode, setDarkMode] = useState(false);
 
   const generateRandomString = () => Math.random().toString(36).substring(2, 7);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     if (session?.user) {
@@ -47,6 +52,28 @@ export default function Page() {
       setIsInputValid(isValid);
     }
   }, [inputValue, session?.user]);
+
+  useEffect(() => {
+    const savedDarkMode = document.cookie.split('; ')
+      .find(row => row.startsWith('darkMode='))
+      ?.split('=')[1] === 'true';
+    
+    if (savedDarkMode !== undefined) {
+      setDarkMode(savedDarkMode);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+    document.cookie = `darkMode=${darkMode}; expires=${expiryDate.toUTCString()}; path=/`;
+  }, [darkMode]);
 
   const handleRandomize = () => {
     setIsAnimating(true);
@@ -182,7 +209,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="text-center min-h-screen flex items-center justify-center font-mono">
+      <div className="bg-white text-center min-h-screen flex items-center justify-center font-mono dark:bg-black">
         <Card className="w-[20rem] md:w-[28rem]">
           <CardContent>
             {!shortened && (
@@ -275,7 +302,7 @@ export default function Page() {
                     {!session?.user ? (
                       <>
                         <Button
-                          className="w-full bg-gray-700"
+                          className="w-full bg-gray-700 dark:bg-gray-400"
                           onClick={handleRandomize}
                           disabled={isAnimating}
                           type="button"
@@ -285,7 +312,7 @@ export default function Page() {
                         <Button
                           onClick={() => signIn("github", { redirectTo: "/" })}
                           type="button"
-                          className="w-full bg-gray-700"
+                          className="w-full bg-gray-700 dark:bg-gray-400"
                         >
                           Sign In
                         </Button>
@@ -295,7 +322,7 @@ export default function Page() {
                   <div className="pt-2">
                     <Button
                       type="submit"
-                      className="w-full"
+                      className="w-full dark:hover:bg-gray-300"
                       disabled={session?.user && !isInputValid}
                     >
                       Shorten
@@ -331,14 +358,18 @@ export default function Page() {
               </>
             )}
             <div className="pt-4">
-              <Link className="underline text-green-700 text-xs" href="/policy">
+              <Link className="underline text-green-700 dark:text-green-300 text-xs" href="/policy">
                 Data Policy
               </Link>
+            {" | "}
+              <button className="underline text-green-700 dark:text-green-300 text-xs" onClick={toggleDarkMode}>
+                Toggle Theme
+              </button>
               {session?.user && (
                 <>
                   {" | "}
                   <button
-                    className="underline text-green-700 text-xs"
+                    className="underline text-green-700 dark:text-green-300 text-xs"
                     onClick={() => signOut()}
                   >
                     Sign Out
