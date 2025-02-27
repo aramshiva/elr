@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SiGithub } from "react-icons/si";
 
 export default function Page() {
   const { data: session } = useSession();
@@ -323,9 +324,9 @@ export default function Page() {
                         <Button
                           onClick={() => signIn("github", { redirectTo: "/" })}
                           type="button"
-                          className="w-full bg-gray-700 dark:bg-gray-400"
+                          className="w-full bg-black font-sans dark:bg-gray-400"
                         >
-                          Sign In
+                          Sign In with <SiGithub />
                         </Button>
                       </>
                     ) : null}
