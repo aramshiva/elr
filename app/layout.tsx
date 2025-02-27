@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "elr",
   description: "An minimal URL shortener service.",
+  icons: {
+    icon: [
+      { url: "/favicon64.png", sizes: "64x64", type: "image/png" },
+      { url: "/favicon128.png", sizes: "128x128", type: "image/png" },
+    ],
+  },
   openGraph: {
     images: [
       {
