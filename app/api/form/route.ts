@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const email = data.email;
 
     const decision = await aj.protect(req, {
-        email,
+        email: email,
     });
 
     console.log("Arcjet decision: ", decision);
