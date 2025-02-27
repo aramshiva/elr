@@ -116,7 +116,7 @@ export default function Page() {
           body: JSON.stringify({
             url: url,
             key: key,
-            email: email,
+            emailAddress: email,
             expiration: expirationDate,
           }),
         })

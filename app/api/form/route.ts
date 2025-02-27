@@ -24,10 +24,10 @@ const aj = arcjet({
 
 export async function POST(req: Request) {
     const data = await req.json();
-    const email = data.email;
+    const email = data.emailAddress;
 
     const decision = await aj.protect(req, {
-        email: email,
+        email,
     });
 
     console.log("Arcjet decision: ", decision);
