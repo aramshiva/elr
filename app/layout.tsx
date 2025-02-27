@@ -17,6 +17,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "elr",
   description: "An minimal URL shortener service.",
+  openGraph: {
+    images: [
+      {
+        url: "/preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "elr - An minimal URL shortener service.",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
