@@ -54,10 +54,12 @@ export default function Page() {
   }, [inputValue, session?.user]);
 
   useEffect(() => {
-    const savedDarkMode = document.cookie.split('; ')
-      .find(row => row.startsWith('darkMode='))
-      ?.split('=')[1] === 'true';
-    
+    const savedDarkMode =
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("darkMode="))
+        ?.split("=")[1] === "true";
+
     if (savedDarkMode !== undefined) {
       setDarkMode(savedDarkMode);
     }
@@ -69,24 +71,33 @@ export default function Page() {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    
+
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 30);
     document.cookie = `darkMode=${darkMode}; expires=${expiryDate.toUTCString()}; path=/`;
   }, [darkMode]);
 
   const handleRandomize = () => {
+    setInputValue("");
     setIsAnimating(true);
     const finalString = generateRandomString();
     const stringLength = 5;
 
     for (let i = 0; i < stringLength; i++) {
       setTimeout(() => {
-        setRandomString((prev) => {
-          const chars = prev.split("");
-          chars[i] = finalString[i];
-          return chars.join("");
-        });
+        if (session?.user) {
+          setInputValue((prev) => {
+            const chars = prev.split("");
+            chars[i] = finalString[i];
+            return chars.join("");
+          });
+        } else {
+          setRandomString((prev) => {
+            const chars = prev.split("");
+            chars[i] = finalString[i];
+            return chars.join("");
+          });
+        }
 
         if (i === stringLength - 1) {
           setIsAnimating(false);
@@ -299,16 +310,16 @@ export default function Page() {
                     )}
                   </div>
                   <div className="flex items-center justify-center gap-2 pt-5">
+                    <Button
+                      className="w-full bg-gray-700 dark:bg-gray-400"
+                      onClick={handleRandomize}
+                      disabled={isAnimating}
+                      type="button"
+                    >
+                      {session?.user ? "Generate random backend" : "Randomize"}
+                    </Button>
                     {!session?.user ? (
                       <>
-                        <Button
-                          className="w-full bg-gray-700 dark:bg-gray-400"
-                          onClick={handleRandomize}
-                          disabled={isAnimating}
-                          type="button"
-                        >
-                          Randomize
-                        </Button>
                         <Button
                           onClick={() => signIn("github", { redirectTo: "/" })}
                           type="button"
@@ -358,11 +369,17 @@ export default function Page() {
               </>
             )}
             <div className="pt-4">
-              <Link className="underline text-green-700 dark:text-green-300 text-xs" href="/policy">
+              <Link
+                className="underline text-green-700 dark:text-green-300 text-xs"
+                href="/policy"
+              >
                 Data Policy
               </Link>
-            {" | "}
-              <button className="underline text-green-700 dark:text-green-300 text-xs" onClick={toggleDarkMode}>
+              {" | "}
+              <button
+                className="underline text-green-700 dark:text-green-300 text-xs"
+                onClick={toggleDarkMode}
+              >
                 Toggle Theme
               </button>
               {session?.user && (
