@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -137,7 +137,7 @@ export default function Page() {
               body: JSON.stringify({
                 email: email,
                 key: key,
-                url: url
+                url: url,
               }),
             }).then((response) => {
               if (!response.ok) {
@@ -214,8 +214,7 @@ export default function Page() {
                       />
                     </div>
                     <div className="flex items-center justify-between gap-2 pb-4 text-sm w-full">
-                      <p>{process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}
-                      </p>
+                      <p>{process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}</p>
                       {!session?.user ? (
                         <Input
                           key="backend"
@@ -267,7 +266,8 @@ export default function Page() {
                     </div>
                     {!session?.user && expirationDate !== "never" && (
                       <p className="text-[0.7rem] text-gray-500 pt-2">
-                        Links will expire after the selected duration. Log in to remove the expiration date.
+                        Links will expire after the selected duration. Log in to
+                        remove the expiration date.
                       </p>
                     )}
                   </div>
@@ -312,10 +312,14 @@ export default function Page() {
                   </p>
                   <p className="text-sm">Share this link:</p>
                   <Link
-                    href={`${process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}${lastKey}`}
+                    href={`${
+                      process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"
+                    }${lastKey}`}
                     className="text-xs underline text-gray-700"
                   >
-                   {`${process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"}${lastKey}`}
+                    {`${
+                      process.env.NEXT_PUBLIC_DOMAIN_URL || "elr.sh/"
+                    }${lastKey}`}
                   </Link>
                   <Button
                     className="w-full mt-4"
@@ -330,6 +334,17 @@ export default function Page() {
               <Link className="underline text-green-700 text-xs" href="/policy">
                 Data Policy
               </Link>
+              {session?.user && (
+                <>
+                  {" | "}
+                  <button
+                    className="underline text-green-700 text-xs"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
