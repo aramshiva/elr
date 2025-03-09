@@ -294,6 +294,8 @@ export default function Page() {
                                 No expiration
                               </SelectItem>
                             )}
+                            <SelectItem value="600">10 minutes</SelectItem>
+                            <SelectItem value="1800">30 minutes</SelectItem>
                             <SelectItem value="3600">1 hour</SelectItem>
                             <SelectItem value="10800">3 hours</SelectItem>
                             <SelectItem value="86400">1 day</SelectItem>
